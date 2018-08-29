@@ -16,7 +16,7 @@ public class ItemRelationService {
 	
 	public List<Item> getRelatedItems(String itemCode){
 		
-		//List<Item> relatedItems = relatedItemRepo.getByItemCode(itemCode);
+		////List<Item> relatedItems = relatedItemRepo.getByItemCode(itemCode);
 		
 		return null;
 	}
