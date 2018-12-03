@@ -29,6 +29,11 @@ public class ItemController {
 		itemService.addItem(item);
 	}
 	
+	@RequestMapping(value = "/items/{itemCode}", method = RequestMethod.GET)
+	public Item getItem(@PathVariable String itemCode) {
+		Item item = itemService.getItem(itemCode);
+		return item;
+	}
 	
 	@RequestMapping(value = "/items", method = RequestMethod.GET)
 	public List<Item> getItems() {
@@ -36,10 +41,27 @@ public class ItemController {
 		return items;
 	}
 	
-	@RequestMapping(value = "items/{itemCode}", method = RequestMethod.GET)
-	public Item getItem(@PathVariable String itemCode) {
-		Item item = itemService.getItem(itemCode);
-		return item;
+	@RequestMapping(value = "/items/{itemCode}", method = RequestMethod.PUT)
+	public void updateItem(@PathVariable String itemCode)
+	{
+		itemService.updateItem(itemCode);
 	}
 	
+	@RequestMapping(value = "/items/{itemCode}", method = RequestMethod.PATCH)
+	public void patchItem(@PathVariable String itemCode)
+	{
+		itemService.patchItem(itemCode);
+	}
+	
+	@RequestMapping(value = "/items/{itemCode}", method = RequestMethod.DELETE)
+	public void deleteItem(@PathVariable String itemCode)
+	{
+		itemService.deleteItem(itemCode);
+	}
+	
+	@RequestMapping(value = "/items", method = RequestMethod.DELETE)
+	public void deleteItems()
+	{
+		itemService.deleteItems();
+	}
 }

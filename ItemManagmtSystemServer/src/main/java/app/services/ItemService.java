@@ -22,7 +22,8 @@ public class ItemService {
 	private ItemAttributeRepository itemAttributeRepo;
 	
 	
-	public void addItem(Item item) throws Exception{
+	public void addItem(Item item) throws Exception
+	{
 		if ( item == null ) {
 			throw new Exception();
 		};
@@ -34,7 +35,8 @@ public class ItemService {
 		//save related
 	}
 	
-	public Item getItem(String itemCode) {
+	public Item getItem(String itemCode) 
+	{
 		
 		Item item = itemRepository.findByItemCode(itemCode);
 		if ( item == null ) return null;
@@ -46,7 +48,8 @@ public class ItemService {
 		return item;
 	}
 	
-	public List<Item> getItems(){
+	public List<Item> getItems()
+	{
 		List<Item> items = new ArrayList<Item>();
 		List<ItemAttribute> itemAttributes;
 		List<Item> relatedItems;
@@ -67,13 +70,15 @@ public class ItemService {
 		return items;
 	}
 	
-	public Item getItem(Long id){
+	public Item getItem(Long id)
+	{
 		Item item = new Item();
 		return item;
 	}
 
 	
-	public String createItem(String itemCode, String itemType, String itemcreationType){
+	public String createItem(String itemCode, String itemType, String itemcreationType)
+	{
 		Item item = new Item();
 		item.setItemCode(itemCode);
 		item.setType(itemType);
@@ -83,13 +88,15 @@ public class ItemService {
 		return "saved";
 	}
 	
-	public List<ItemAttribute> findItemAttributes(String itemCode){
+	public List<ItemAttribute> findItemAttributes(String itemCode)
+	{
 		List<ItemAttribute> iterItemAttributes = itemAttributeRepo.findByItemCode(itemCode);
 		if ( iterItemAttributes == null || iterItemAttributes.size() == 0 ) return null;
 		return iterItemAttributes;
 	}
 	
-	public List<Item> findRelatedItems(String itemCode){
+	public List<Item> findRelatedItems(String itemCode)
+	{
 		List<ItemRelation> itemRelations = relatedItemsRepo.getByItemCode(itemCode);
 		if ( itemRelations == null || itemRelations.size() == 0 ) return null;
 		List<Item> relatedItems = new ArrayList<Item>();
@@ -104,7 +111,8 @@ public class ItemService {
 		return relatedItems;
 	}
 	
-	public void addItemAttributes(Item item) {
+	public void addItemAttributes(Item item) 
+	{
 		
 		if ( item == null ) {
 			//throw new Exception();
@@ -115,5 +123,25 @@ public class ItemService {
 			itemAttribute.setItemCode(itemCode);
 			itemAttributeRepo.save(itemAttribute);
 		}
+	}
+
+	public void deleteItem(String itemCode) 
+	{
+		//itemRepository.delete(itemCode);
+	}
+	
+	public void deleteItems() 
+	{
+		itemRepository.deleteAll();	
+	}
+
+	public void updateItem(String itemCode) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void patchItem(String itemCode) {
+		// TODO Auto-generated method stub
+		
 	}
 }
