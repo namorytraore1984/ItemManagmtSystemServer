@@ -1,27 +1,30 @@
-package app.services;
+package app.services.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import app.models.Item;
-import app.models.ItemAttribute;
-import app.models.ItemRelation;
+
+import app.dataobjects.Item;
+import app.dataobjects.ItemAttribute;
+import app.dataobjects.ItemRelation;
 import app.repository.ItemAttributeRepository;
 import app.repository.ItemRelationRepository;
 import app.repository.ItemRepository;
+import app.services.api.IItemService;
 
 @Service
-public class ItemService {
+public class ItemService implements IItemService {
 	
 	@Autowired
-	ItemRepository itemRepository;
+	private ItemRepository itemRepository;
 	@Autowired
-	ItemRelationRepository relatedItemsRepo;
+	private ItemRelationRepository relatedItemsRepo;
 	@Autowired
 	private ItemAttributeRepository itemAttributeRepo;
 	
-	
+	@Override
 	public void addItem(Item item) throws Exception
 	{
 		if ( item == null ) {
@@ -35,11 +38,14 @@ public class ItemService {
 		//save related
 	}
 	
-	public Item getItem(String itemCode) 
+	@Override
+	public Item getItemByCode(String itemCode) 
 	{
 		
-		Item item = itemRepository.findByItemCode(itemCode);
-		if ( item == null ) return null;
+		//Item item = itemRepository.findByItemCode(itemCode);
+		Optional<Item> itemOpt = itemRepository.findByItemCode(itemCode);
+		if ( !itemOpt.isPresent() ) return null;
+		Item item = itemOpt.get();
 		//set item attribute
 		List<ItemAttribute> itemAttributes = findItemAttributes(itemCode);
 		item.setAttributes(itemAttributes);
@@ -48,6 +54,7 @@ public class ItemService {
 		return item;
 	}
 	
+	@Override
 	public List<Item> getItems()
 	{
 		List<Item> items = new ArrayList<Item>();
@@ -70,13 +77,14 @@ public class ItemService {
 		return items;
 	}
 	
+	@Override
 	public Item getItem(Long id)
 	{
 		Item item = new Item();
 		return item;
 	}
 
-	
+	@Override
 	public String createItem(String itemCode, String itemType, String itemcreationType)
 	{
 		Item item = new Item();
@@ -88,6 +96,7 @@ public class ItemService {
 		return "saved";
 	}
 	
+	@Override
 	public List<ItemAttribute> findItemAttributes(String itemCode)
 	{
 		List<ItemAttribute> iterItemAttributes = itemAttributeRepo.findByItemCode(itemCode);
@@ -95,6 +104,7 @@ public class ItemService {
 		return iterItemAttributes;
 	}
 	
+	@Override
 	public List<Item> findRelatedItems(String itemCode)
 	{
 		List<ItemRelation> itemRelations = relatedItemsRepo.getByItemCode(itemCode);
@@ -103,14 +113,19 @@ public class ItemService {
 		for ( ItemRelation ir : itemRelations ) {
 			if ( ir == null ) continue;
 			String relatedItemCode = ir.getRelatedItemCode();
-			Item relatedItem = itemRepository.findByItemCode(relatedItemCode);
-			List<ItemAttribute> relatedItemAttributes = findItemAttributes(relatedItemCode);
-			relatedItem.setAttributes(relatedItemAttributes);
-			relatedItems.add(relatedItem);
+			Optional<Item> relatedItemOpt = itemRepository.findByItemCode(relatedItemCode);
+			if ( relatedItemOpt.isPresent() )
+			{
+				Item relatedItem = relatedItemOpt.get();
+				List<ItemAttribute> relatedItemAttributes = findItemAttributes(relatedItemCode);
+				relatedItem.setAttributes(relatedItemAttributes);
+				relatedItems.add(relatedItem);
+			}
 		}
 		return relatedItems;
 	}
 	
+	@Override
 	public void addItemAttributes(Item item) 
 	{
 		
@@ -125,21 +140,25 @@ public class ItemService {
 		}
 	}
 
+	@Override
 	public void deleteItem(String itemCode) 
 	{
 		//itemRepository.delete(itemCode);
 	}
 	
+	@Override
 	public void deleteItems() 
 	{
 		itemRepository.deleteAll();	
 	}
 
+	@Override
 	public void updateItem(String itemCode) {
 		// TODO Auto-generated method stub
 		
 	}
 
+	@Override
 	public void patchItem(String itemCode) {
 		// TODO Auto-generated method stub
 		

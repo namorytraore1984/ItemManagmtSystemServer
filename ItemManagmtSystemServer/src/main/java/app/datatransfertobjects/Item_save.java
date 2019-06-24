@@ -1,11 +1,10 @@
-package app.businessObjects;
-
-import app.models.Item;
-import app.models.ItemRelation;
+package app.datatransfertobjects;
 
 import java.util.List;
 
-import app.models.ItemAttribute;
+import app.dataobjects.Item;
+import app.dataobjects.ItemAttribute;
+import app.dataobjects.ItemRelation;
 
 public class Item_save {
 	private Item item;

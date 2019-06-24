@@ -1,4 +1,4 @@
-package app.models;
+package app.dataobjects;
 
 
 import java.util.List;
@@ -19,6 +19,7 @@ public class Item {
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long id;
 	private String itemCode;
+	private String name;
 	private String type;
 	private String origin;
 	
@@ -54,23 +55,34 @@ public class Item {
 	public void setId(Long id) {
 		this.id = id;
 	}
+	
 	public String getItemCode() {
 		return itemCode;
 	}
 	public void setItemCode(String itemCode) {
 		this.itemCode = itemCode;
 	}
+	
 	public String getType() {
 		return type;
 	}
 	public void setType(String type) {
 		this.type = type;
 	}
+	
 	public String getOrigin() {
 		return origin;
 	}
 	public void setOrigin(String origin) {
 		this.origin = origin;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 }

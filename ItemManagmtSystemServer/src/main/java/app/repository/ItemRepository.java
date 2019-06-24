@@ -1,9 +1,14 @@
 package app.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-import app.models.Item;
+import app.dataobjects.Item;
 
+@Repository
 public interface ItemRepository extends CrudRepository<Item, Long> {
-	Item findByItemCode(String itemCode);
+
+	Optional<Item> findByItemCode(String itemCode);
 }
