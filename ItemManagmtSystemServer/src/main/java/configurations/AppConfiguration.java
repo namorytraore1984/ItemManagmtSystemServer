@@ -1,7 +1,7 @@
 package configurations;
 
 
-import org.dozer.DozerBeanMapper;
+//import org.dozer.DozerBeanMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -25,8 +25,8 @@ public class AppConfiguration {
 		return source;
 	}
 	
-	@Bean
+	/*@Bean
 	public DozerBeanMapper mapper() {
 		return new DozerBeanMapper();
-	}
+	}*/
 }

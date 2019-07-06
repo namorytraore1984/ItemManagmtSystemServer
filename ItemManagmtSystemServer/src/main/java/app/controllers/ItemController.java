@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
-import app.dataobjects.Item;
+import app.datatransfertobjects.ItemDTO;
 import app.services.api.IItemService;
 
 
@@ -27,38 +27,42 @@ public class ItemController {
 	
 	
 	@PostMapping(value = "/items", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-	public void addItem(@RequestBody Item item) throws Exception {
-		itemService.addItem(item);
+	public ResponseEntity<ItemDTO> addItem(@RequestBody ItemDTO item) throws Exception {
+		
+		//ResponseEntity<Void> response = new ResponseEntity<>(status);
+		ItemDTO itemCreated = itemService.addItem(item);
+		//ResponseEntity.status(1).content
+		return null;
 	}
 	
 	@GetMapping(value = "/items/{itemCode}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public Item getItemByCode(@PathVariable String itemCode) {
-		Item item = itemService.getItemByCode(itemCode);
+	public ItemDTO getItemByCode(@PathVariable String itemCode) {
+		ItemDTO item = itemService.getItemByCode(itemCode);
 		return item;
 	}
 	
 	@GetMapping(value = "/items", produces = MediaType.APPLICATION_JSON_VALUE)
-	public List<Item> getItems() {
-		List<Item> items = itemService.getItems();
+	public List<ItemDTO> getItems() {
+		List<ItemDTO> items = itemService.getItems();
 		return items;
 	}
 	
-	@PutMapping(value = "/items/{itemCode}")
-	public void updateItem(@PathVariable String itemCode)
+	@PutMapping(value = "/items")
+	public void updateItem(@RequestBody ItemDTO item) throws Exception
 	{
-		itemService.updateItem(itemCode);
+		itemService.updateItem(item);
 	}
 	
 	@PatchMapping(value = "/items/{itemCode}")
-	public void patchItem(@PathVariable String itemCode)
+	public void patchItem(@PathVariable String itemCode) throws Exception
 	{
 		itemService.patchItem(itemCode);
 	}
 	
 	@DeleteMapping(value = "/items/{itemCode}")
-	public void deleteItem(@PathVariable String itemCode)
+	public void deleteItem(@PathVariable String itemCode) throws Exception
 	{
-		itemService.deleteItem(itemCode);
+		itemService.deleteItemByItemCode(itemCode);
 	}
 	
 	@DeleteMapping(value = "/items")

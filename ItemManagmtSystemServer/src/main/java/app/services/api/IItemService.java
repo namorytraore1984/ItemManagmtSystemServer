@@ -2,32 +2,33 @@ package app.services.api;
 
 import java.util.List;
 
-import app.dataobjects.Item;
+
 import app.dataobjects.ItemAttribute;
+import app.dataobjects.ItemDO;
+import app.datatransfertobjects.ItemDTO;
 
 public interface IItemService {
 	
-	public void addItem(Item item) throws Exception;	
-	public Item getItemByCode(String itemCode);
+	public ItemDTO addItem(ItemDTO item) throws Exception;
 	
-	public List<Item> getItems();
+	public ItemDTO getItemByCode(String itemCode);
 	
-	public Item getItem(Long id);
-
-	public String createItem(String itemCode, String itemType, String itemcreationType);
+	public List<ItemDTO> getItems();
+	
+	public ItemDTO getItem(Long id);
 	
 	public List<ItemAttribute> findItemAttributes(String itemCode);
 	
-	public List<Item> findRelatedItems(String itemCode);
+	public List<ItemDO> findRelatedItems(String itemCode);
 	
-	public void addItemAttributes(Item item);
+	public void addItemAttributes(ItemDTO item);
 
-	public void deleteItem(String itemCode);
+	public void deleteItemByItemCode(String itemCode) throws Exception;
 	
 	public void deleteItems();
 
-	public void updateItem(String itemCode);
+	public void updateItem(ItemDTO item) throws Exception;
 
-	public void patchItem(String itemCode);
+	public void patchItem(String itemCode) throws Exception;
 
 }

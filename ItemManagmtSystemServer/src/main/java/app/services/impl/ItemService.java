@@ -3,66 +3,76 @@ package app.services.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mapstruct.factory.Mappers;
 import org.springframework.stereotype.Service;
-
-import app.dataobjects.Item;
+import app.dataobjects.ItemDO;
 import app.dataobjects.ItemAttribute;
 import app.dataobjects.ItemRelation;
+import app.datatransfertobjects.ItemDTO;
 import app.repository.ItemAttributeRepository;
 import app.repository.ItemRelationRepository;
 import app.repository.ItemRepository;
 import app.services.api.IItemService;
+import app.services.mappers.ItemMapper;
 
 @Service
 public class ItemService implements IItemService {
 	
-	@Autowired
 	private ItemRepository itemRepository;
-	@Autowired
 	private ItemRelationRepository relatedItemsRepo;
-	@Autowired
 	private ItemAttributeRepository itemAttributeRepo;
 	
-	@Override
-	public void addItem(Item item) throws Exception
-	{
-		if ( item == null ) {
-			throw new Exception();
-		};
-		//save item instance
-		itemRepository.save(item);
-		
-		//save item attribute
-		addItemAttributes(item);
-		//save related
+
+	private ItemMapper itemMapper = Mappers.getMapper(ItemMapper.class);
+	
+	public ItemService(ItemRepository itemRepository, ItemRelationRepository relatedItemsRepo, ItemAttributeRepository itemAttributeRepo) {
+		this.itemRepository = itemRepository;
+		this.relatedItemsRepo = relatedItemsRepo;
+		this.itemAttributeRepo = itemAttributeRepo;
 	}
 	
 	@Override
-	public Item getItemByCode(String itemCode) 
+	public ItemDTO addItem(ItemDTO itemDTO) throws Exception
 	{
-		
-		//Item item = itemRepository.findByItemCode(itemCode);
-		Optional<Item> itemOpt = itemRepository.findByItemCode(itemCode);
+		if ( itemDTO == null ) {
+			throw new Exception("L'objet recu est null");
+		};
+		Optional<ItemDO> existingItemOpt = itemRepository.findByItemCode(itemDTO.getItemCode());
+		if ( existingItemOpt.isPresent() ) {
+			// throw exception : cet element existe deja
+			throw new Exception("cet element existe deja");
+		}
+		//save item instance
+		ItemDO itemSaved = itemRepository.save(itemMapper.mapItemDTOToItemDO(itemDTO));
+		itemDTO.setId(itemSaved.getId());
+		//save item attribute
+		addItemAttributes(itemDTO);
+		return itemDTO;
+	}
+	
+	@Override
+	public ItemDTO getItemByCode(String itemCode) 
+	{
+		Optional<ItemDO> itemOpt = itemRepository.findByItemCode(itemCode);
 		if ( !itemOpt.isPresent() ) return null;
-		Item item = itemOpt.get();
+		ItemDO item = itemOpt.get();
 		//set item attribute
 		List<ItemAttribute> itemAttributes = findItemAttributes(itemCode);
 		item.setAttributes(itemAttributes);
-		List<Item> relatedItems = findRelatedItems(itemCode);
+		List<ItemDO> relatedItems = findRelatedItems(itemCode);
 		item.setRelatedItems(relatedItems);	
-		return item;
+		return itemMapper.mapItemDOToItemDTO(item);
 	}
 	
 	@Override
-	public List<Item> getItems()
+	public List<ItemDTO> getItems()
 	{
-		List<Item> items = new ArrayList<Item>();
+		List<ItemDTO> items = new ArrayList<>();
 		List<ItemAttribute> itemAttributes;
-		List<Item> relatedItems;
-		Iterable<Item> itemsFromRepo =  itemRepository.findAll();
+		List<ItemDO> relatedItems;
+		Iterable<ItemDO> itemsFromRepo =  itemRepository.findAll();
 		
-		for(Item item : itemsFromRepo) {
+		for(ItemDO item : itemsFromRepo) {
 			
 			if ( item == null ) continue;
 			String itemCode = item.getItemCode();
@@ -71,29 +81,20 @@ public class ItemService implements IItemService {
 			//set related items
 			relatedItems = findRelatedItems(itemCode);
 			item.setRelatedItems(relatedItems);			
-			items.add(item);
+			items.add(itemMapper.mapItemDOToItemDTO(item));
 		}
 		
 		return items;
 	}
 	
 	@Override
-	public Item getItem(Long id)
+	public ItemDTO getItem(Long id)
 	{
-		Item item = new Item();
-		return item;
-	}
-
-	@Override
-	public String createItem(String itemCode, String itemType, String itemcreationType)
-	{
-		Item item = new Item();
-		item.setItemCode(itemCode);
-		item.setType(itemType);
-		item.setOrigin(itemcreationType);
-		
-		itemRepository.save(item);
-		return "saved";
+		Optional<ItemDO> itemDoOpt = itemRepository.findById(id);
+		if (itemDoOpt.isPresent()) {
+			return itemMapper.mapItemDOToItemDTO(itemDoOpt.get());
+		}
+		return null;
 	}
 	
 	@Override
@@ -105,18 +106,18 @@ public class ItemService implements IItemService {
 	}
 	
 	@Override
-	public List<Item> findRelatedItems(String itemCode)
+	public List<ItemDO> findRelatedItems(String itemCode)
 	{
 		List<ItemRelation> itemRelations = relatedItemsRepo.getByItemCode(itemCode);
 		if ( itemRelations == null || itemRelations.size() == 0 ) return null;
-		List<Item> relatedItems = new ArrayList<Item>();
+		List<ItemDO> relatedItems = new ArrayList<>();
 		for ( ItemRelation ir : itemRelations ) {
 			if ( ir == null ) continue;
 			String relatedItemCode = ir.getRelatedItemCode();
-			Optional<Item> relatedItemOpt = itemRepository.findByItemCode(relatedItemCode);
+			Optional<ItemDO> relatedItemOpt = itemRepository.findByItemCode(relatedItemCode);
 			if ( relatedItemOpt.isPresent() )
 			{
-				Item relatedItem = relatedItemOpt.get();
+				ItemDO relatedItem = relatedItemOpt.get();
 				List<ItemAttribute> relatedItemAttributes = findItemAttributes(relatedItemCode);
 				relatedItem.setAttributes(relatedItemAttributes);
 				relatedItems.add(relatedItem);
@@ -124,26 +125,15 @@ public class ItemService implements IItemService {
 		}
 		return relatedItems;
 	}
-	
-	@Override
-	public void addItemAttributes(Item item) 
-	{
-		
-		if ( item == null ) {
-			//throw new Exception();
-		}
-		String itemCode = item.getItemCode();
-		List<ItemAttribute> itemAttributes = item.getAttributes();
-		for ( ItemAttribute itemAttribute : itemAttributes ) {
-			itemAttribute.setItemCode(itemCode);
-			itemAttributeRepo.save(itemAttribute);
-		}
-	}
 
 	@Override
-	public void deleteItem(String itemCode) 
+	public void deleteItemByItemCode(String itemCode) throws Exception
 	{
-		//itemRepository.delete(itemCode);
+		Optional<ItemDO> itemDOOpt = itemRepository.findByItemCode(itemCode);
+		if (!itemDOOpt.isPresent()) {
+			throw new Exception("Cet item n'existe pas");
+		}
+		itemRepository.delete(itemDOOpt.get());
 	}
 	
 	@Override
@@ -153,14 +143,39 @@ public class ItemService implements IItemService {
 	}
 
 	@Override
-	public void updateItem(String itemCode) {
-		// TODO Auto-generated method stub
+	public void updateItem(ItemDTO item) throws Exception {
 		
+		if ( item != null ) {
+			Optional<ItemDO> itemToUpdateOpt = itemRepository.findByItemCode(item.getItemCode());		
+			if ( !itemToUpdateOpt.isPresent() ) {
+				// Throw exception : cet element n'existe pas
+				throw new Exception("cet element n'existe pas");
+			}
+			
+			ItemDO itemDO = itemMapper.mapItemDTOToItemDO(item);
+			itemDO.setId(itemToUpdateOpt.get().getId());
+			itemRepository.save(itemDO);			
+		}
 	}
 
 	@Override
 	public void patchItem(String itemCode) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public void addItemAttributes(ItemDTO itemDTO) {
+
+		if (itemDTO != null) {
+			String itemCode = itemDTO.getItemCode();
+			List<ItemAttribute> itemAttributes = itemDTO.getAttributes();
+			if (itemAttributes != null) {				
+				itemAttributes.stream().forEach(itemAttribute -> {
+					itemAttribute.setItemCode(itemCode);
+					itemAttributeRepo.save(itemAttribute);
+				});
+			}
+		}
 	}
 }

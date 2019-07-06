@@ -1,23 +1,24 @@
 package app.dataobjects;
 
-
 import java.util.List;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @Entity
 @Table(name = "dcpc_item")
-public class Item {
+public class ItemDO {
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
+	@Column(unique = true, nullable = false)
 	private String itemCode;
 	private String name;
 	private String type;
@@ -29,7 +30,7 @@ public class Item {
 	
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	@Transient
-	private List<Item> relatedItems;
+	private List<ItemDO> relatedItems;
 	
 
 	public Long getId() {
@@ -44,11 +45,11 @@ public class Item {
 		this.attributes = attributes;
 	}
 
-	public List<Item> getRelatedItems() {
+	public List<ItemDO> getRelatedItems() {
 		return relatedItems;
 	}
 
-	public void setRelatedItems(List<Item> relatedItems) {
+	public void setRelatedItems(List<ItemDO> relatedItems) {
 		this.relatedItems = relatedItems;
 	}
 
@@ -83,6 +84,6 @@ public class Item {
 
 	public void setName(String name) {
 		this.name = name;
-	}
+	}	
 	
 }

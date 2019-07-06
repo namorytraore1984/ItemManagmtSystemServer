@@ -5,10 +5,10 @@ import java.util.Optional;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-import app.dataobjects.Item;
+import app.dataobjects.ItemDO;
 
 @Repository
-public interface ItemRepository extends CrudRepository<Item, Long> {
+public interface ItemRepository extends CrudRepository<ItemDO, Long> {
 
-	Optional<Item> findByItemCode(String itemCode);
+	Optional<ItemDO> findByItemCode(String itemCode);
 }
